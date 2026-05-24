@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ECU Telemetry Live</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 450px;
+        }
+
+        .title {
+            font-size: 40px;
+            margin-bottom: 25px;
+            color: #22c55e;
+            text-align: center;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        .item {
+            margin-bottom: 18px;
+            font-size: 22px;
+        }
+
+        .label {
+            color: #94a3b8;
+        }
+
+        .value {
+            color: white;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #ef4444;
+        }
+
+        .normal {
+            color: #22c55e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1 class="title">🚗 ECU Telemetry</h1>
+
+        <div class="card">
+
+            <div class="item">
+                <span class="label">RPM:</span>
+                <span id="rpm" class="value">Bekleniyor...</span>
+            </div>
+
+            <div class="item">
+                <span class="label">Temperature:</span>
+                <span id="temperature" class="value">Bekleniyor...</span>
+            </div>
+
+            <div class="item">
+                <span class="label">Speed:</span>
+                <span id="speed" class="value">Bekleniyor...</span>
+            </div>
+
+            <div class="item">
+                <span class="label">Fuel Level:</span>
+                <span id="fuel" class="value">Bekleniyor...</span>
+            </div>
+
+            <div class="item">
+                <span class="label">Status:</span>
+                <span id="status" class="value">Bekleniyor...</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/telemetryHub")
+            .build();
+
+        connection.on("ReceiveTelemetry", (data) => {
+
+            console.log("VERI GELDI:", data);
+
+            document.getElementById("rpm").innerText = data.rpm;
+            document.getElementById("temperature").innerText = data.temperature;
+            document.getElementById("speed").innerText = data.speed;
+            document.getElementById("fuel").innerText = data.fuelLevel;
+            document.getElementById("status").innerText = data.status;
+
+        });
+
+        connection.start()
+            .then(() => {
+                console.log("SignalR Connected");
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+
+    </script>
+
+</body>
+</html>
